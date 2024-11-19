@@ -1,16 +1,11 @@
-# This is a sample Python script.
+import discord
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+class Client(discord.Client):
+    async def on_ready(self):
+        print(f'HELLO I AM {self.user}')
 
+intents = discord.Intents.default()
+intents.message_content = True
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+client = Client(intents=intents)
+client.run('MTMwODI3MTUzODY0MjA5NjE2OA.Gsg_H9.XUUgmzmnyree5ezUBdPp0ujnP1JWu96jTtW_yY')
