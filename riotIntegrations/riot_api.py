@@ -40,7 +40,6 @@ def monitor_game(api_key: str, region: str, game_id: int, username: str, tag: st
     # Poll the spectator endpoint to monitor the game's progress
     print(f"Monitoring game {game_id}...")
     while True:
-        print(spectator_url)
         response = requests.get(spectator_url, headers=headers)
         if response.status_code == 404:  # Game no longer active
             print("Game has ended. Fetching results...")
@@ -54,7 +53,6 @@ def monitor_game(api_key: str, region: str, game_id: int, username: str, tag: st
     # Get match results once game is over
     match_response = requests.get(match_url)
     match_ids = match_response.json()
-    print(match_ids)
     if match_response.status_code != 200:
         print(f"Failed to fetch match results: {match_response.status_code}")
         return None
@@ -143,6 +141,7 @@ def did_player_win(game_result, summoner_name):
     try:
         # Find the player's participant entry
         participants = game_result["info"]["participants"]
+        #UNDERSCORES NEED TO BE PARSED INTO SPACES
         player = next((p for p in participants if p["summonerName"].lower() == summoner_name.lower()), None)
 
         if not player:
