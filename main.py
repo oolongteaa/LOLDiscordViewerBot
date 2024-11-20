@@ -70,4 +70,21 @@ if __name__ == "__main__":
 
         await ctx.send(response)
 
+
+    async def send_message_to_channel(channel_id, message):
+        """
+        Sends a message to a specific channel by ID.
+
+        :param channel_id: The ID of the channel to send the message to.
+        :param message: The message to send.
+        """
+        # Get the channel object
+        channel = bot.get_channel(channel_id)
+
+        if channel:
+            # Send the message
+            await channel.send(message)
+        else:
+            print(f"Channel with ID {channel_id} not found.")
+
     bot.run(TOKEN)

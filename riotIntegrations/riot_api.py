@@ -17,7 +17,7 @@ def spawn_game_monitor(api_key, region, game_id, username, tag, match_region):
     print(f"Spawned new process for {username}'s game (Game ID: {game_id}).")
     return process  # Return the process handle
 
-def monitor_game(api_key: str, region: str, game_id: int, username: str, tag: str, match_region: str) -> dict:
+def monitor_game(api_key: str, region: str, game_id: int, username: str, tag: str, match_region: str) -> str:
     """
     Monitor a League of Legends game and return the result once it finishes.
 
@@ -65,9 +65,16 @@ def monitor_game(api_key: str, region: str, game_id: int, username: str, tag: st
     match_details = requests.get(detailed_match_url, headers=headers)
     match_json = match_details.json()
     if match_details.status_code == 200:
-        #TODO NEED TO DETERMINE WHO WON THE GAME
-        print(f"game finished {match_json}")
-        return match_json
+        result = did_player_win(match_json, username)
+        if result:
+            print(f"{username} won the game!")
+            return f"{username} won the game!"
+        elif not result:
+            print(f"{username} lost!")
+            return f"{username} lost!"
+        else:
+            print("Failed to parse game data")
+            return None
     else:
         print(f"Failed to fetch detailed match data: {match_details.status_code}")
         return None
@@ -122,4 +129,38 @@ def is_in_game(api_key: str, riot_region: str, lol_region: str, username: str, t
         return None
     else:
         print(f"Error checking game status: {game_response.status_code}")
+        return None
+
+
+def did_player_win(game_result, summoner_name):
+    """
+    Determine if a player won a game from the match result JSON.
+
+    :param game_result: The match result JSON from Riot API.
+    :param summoner_name: The summoner's in-game name.
+    :return: True if the player won, False if lost, or None if not found.
+    """
+    try:
+        # Find the player's participant entry
+        participants = game_result["info"]["participants"]
+        player = next((p for p in participants if p["summonerName"].lower() == summoner_name.lower()), None)
+
+        if not player:
+            print(f"Player {summoner_name} not found in the game.")
+            return None
+
+        # Get the player's teamId
+        player_team_id = player["teamId"]
+
+        # Check the team's win status
+        teams = game_result["info"]["teams"]
+        winning_team = next((t for t in teams if t["teamId"] == player_team_id), None)
+
+        if winning_team:
+            return winning_team["win"]  # Returns True if won, False otherwise
+        else:
+            print(f"Team {player_team_id} not found in the game.")
+            return None
+    except KeyError as e:
+        print(f"Key error in JSON structure: {e}")
         return None
